@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC  
+    "-//mybatis.org//DTD Config 3.0//EN"  
+    "http://mybatis.org/dtd/mybatis-3-config.dtd">  
+<configuration> 
+<!--     <mappers>   -->
+<!--         <mapper resource="com/wyf/jxjpdxt/dao/TSSysUserinfDao.xml"/>   -->
+<!--     </mappers>   -->
+<!-- myBatis拦截 -->
+<plugins>
+	<plugin interceptor="com.scy.zhixing.common.page.PageInterceptor">
+		<property name="queryPageMethod" value="queryByPage"/>
+	</plugin>
+</plugins>
+</configuration>

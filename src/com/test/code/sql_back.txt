@@ -1,0 +1,43 @@
+
+		
+			/* postgresql
+			SELECT
+		    col.table_schema ,
+		    col.table_name ,
+		    col.ordinal_position,
+		    col.column_name ,
+		    col.data_type ,
+		    col.character_maximum_length,
+		    col.numeric_precision,
+		    col.numeric_scale,
+		    col.is_nullable,
+		    col.column_default ,
+		    des.description
+		FROM
+		    information_schema.columns col LEFT JOIN pg_description des
+		        ON col.table_name::regclass = des.objoid
+		    AND col.ordinal_position = des.objsubid
+		WHERE
+		    table_schema = 'XXXX'
+		    AND table_name = 'XXXX'
+		ORDER BY
+		    ordinal_position;
+			*/
+			
+			/* oracle*/
+			String sql="SELECT c.COLUMN_ID, c.column_name, c.DATA_PRECISION,c.data_type ,cm.COMMENTS "
+					+"from user_tab_columns  c ,user_col_comments cm "
+					+"where c.COLUMN_NAME=cm.COLUMN_NAME(+) "
+					+"AND c.table_name=? and c.table_name=cm.table_name  ORDER BY c.COLUMN_ID ";
+					
+					
+			/*mysql
+			String sql = ""
+			+"SELECT "
+				+"c.ORDINAL_POSITION,c.COLUMN_NAME,c.NUMERIC_PRECISION,c.DATA_TYPE,c.COLUMN_COMMENT "
+			+"FROM "
+				+"INFORMATION_SCHEMA.COLUMNS c "
+			+"WHERE "
+				+"table_name = ? ";
+			//+" AND table_schema = 'answer' ";
+			*/

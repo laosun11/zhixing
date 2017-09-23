@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+	xmlns:jee="http://www.springframework.org/schema/jee" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context.xsd
+	http://www.springframework.org/schema/mvc
+	http://www.springframework.org/schema/mvc/spring-mvc.xsd
+	http://www.springframework.org/schema/tx
+	http://www.springframework.org/schema/tx/spring-tx.xsd
+	http://www.springframework.org/schema/aop
+	http://www.springframework.org/schema/aop/spring-aop.xsd">
+	
+	<context:component-scan base-package="com.scy.zhixing">
+		<context:exclude-filter type="annotation"
+			expression="org.springframework.stereotype.Controller" />
+	</context:component-scan>
+	<!-- 加载数据库连接的资源文件 -->
+	<context:property-placeholder location="classpath:jdbc.properties" />
+ 	<!-- 通知 --> 
+<!--     <tx:advice id="txAdvice" transaction-manager="transactionManager"> -->
+<!--         <tx:attributes> -->
+<!--             传播行为 -->
+<!--             <tx:method name="save*" propagation="REQUIRED"/> -->
+<!--             <tx:method name="insert*" propagation="REQUIRED"/> -->
+<!--             <tx:method name="update*" propagation="REQUIRED"/> -->
+<!--             <tx:method name="delete*" propagation="REQUIRED"/> -->
+<!--             <tx:method name="find*" propagation="SUPPORTS" read-only="true"/> -->
+<!--         </tx:attributes> -->
+<!--     </tx:advice> -->
+    
+ 	<!-- 配置aop  --> 
+<!--     <aop:config> -->
+<!--         <aop:advisor advice-ref="txAdvice" pointcut="execution(* com.wyf.jxjpdxt.service.impl.*.*(..))"/> -->
+<!--     </aop:config> -->
+	
+<!-- 配置数据源 dbcp数据库连接池 -->
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName" value="${jdbc.driverClassName}" />
+		<property name="url" value="${jdbc.url}" />
+		<property name="username" value="${jdbc.username}" />
+		<property name="password" value="${jdbc.password}" />
+	</bean>
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+    	<!-- 配置数据源 -->
+    	<property name="dataSource" ref="dataSource"/>
+	</bean>
+<bean id="transactionInterceptor" class="org.springframework.transaction.interceptor.TransactionInterceptor">
+		<property name="transactionManager" ref="transactionManager" />
+		<property name="transactionAttributes">
+			<props>
+				<prop key="save*">PROPAGATION_REQUIRED</prop>
+				<prop key="insert*">PROPAGATION_REQUIRED</prop>
+				<prop key="update*">PROPAGATION_REQUIRED</prop>
+				<prop key="remove*">PROPAGATION_REQUIRED</prop>
+				<prop key="delete*">PROPAGATION_REQUIRED</prop>
+			</props>
+		</property>
+	</bean>
+
+	<bean id="beanNameAutoProxyCreator" class="org.springframework.aop.framework.autoproxy.BeanNameAutoProxyCreator">
+		<property name="proxyTargetClass" value="true"></property>
+		<!--在类以 *Service,*ServiceImpl 结尾的情况下使用事物 -->
+<!-- 		<property name="beanNames" value="*Service,*ServiceImpl,I*Service" > -->
+		<property name="beanNames" >
+		 	<list>
+                <value>*Service</value>
+                <value>*ServiceImpl</value>
+                <value>I*Service</value>
+            </list>
+        </property>
+		<property name="interceptorNames">
+			<list>
+				<value>transactionInterceptor</value>
+			</list>
+		</property>
+		<property name="order" value="100"/>
+	</bean>
+
+	<!-- jdbcTemplate -->
+	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<!-- 配置sqlSessionFactory -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<!-- 数据库连接池 -->
+		<property name="dataSource" ref="dataSource" />
+		<!-- 加载Mybatis全局配置文件 -->
+		<property name="configLocation" value="classpath:mybatis-config.xml" />
+		<property name="mapperLocations" value="classpath*:com/wyf/jxjpdxt/dao/*.xml" />
+        <property name="typeHandlersPackage" value="com.tx.core.mybatis.handler"></property>
+	</bean>
+
+	 <!-- 
+	      basePackage:使用分号或逗号 作为分隔符设置多于一个的包路径
+	      annotationClass 属性指定了要寻找的注解名称。 
+	      markerInterface 属性指定了要寻找的父 接口。如果两者都被指定了,加入到接口中的映射器会匹配两种标准。
+	            默认情况下,这两个 属性都是 null,所以在基包中给定的所有接口可以作为映射器加载
+	     -->
+	    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+	  		<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
+	  		<property name="basePackage" value="com" />  		
+	  		<property name="annotationClass" value="com.scy.zhixing.annotation.AnnotationDAO" />
+		</bean>
+
+</beans>

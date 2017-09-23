@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" id="WebApp_ID" version="3.0">
+  <display-name>奖学金评定系统</display-name>
+  
+   <!-- 404错误拦截 -->
+  <error-page>
+    <error-code>404</error-code>
+    <location>/error/error404.jsp</location>
+  </error-page>
+  <!-- 500错误拦截 -->
+  <error-page>
+    <error-code>500</error-code>
+    <location>/error/error500.jsp</location>
+  </error-page>
+  <!-- 监听spring -->
+  <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+  </listener>
+   <listener>    
+    <listener-class>com.scy.zhixing.common.SessionListener</listener-class>    
+  </listener>
+  
+  <!-- 配置spring文档 -->
+  <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>classpath:springapplication.xml</param-value>
+  </context-param>
+  <!-- 配置前端控制器 -->
+  <servlet>
+      <servlet-name>spring</servlet-name>
+      <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+      <init-param>
+          <!-- ContextconfigLocation配置springmvc加载的配置文件
+                                        适配器、处理映射器等
+           -->
+          <param-name>contextConfigLocation</param-name>
+          <param-value>classpath:springmvc-servlet.xml</param-value>
+      </init-param>
+  </servlet>
+  <servlet-mapping>
+      <servlet-name>spring</servlet-name>
+      <!-- 1、.action访问以.action结尾的  由DispatcherServlet进行解析
+           2、/,所有访问都由DispatcherServlet进行解析
+       -->
+      <url-pattern>*.do</url-pattern>
+  </servlet-mapping>
+  
+   <!-- 解决post乱码问题的过滤器 -->
+  <!--<filter>
+      <filter-name>CharacterEncodingFilter</filter-name>
+      <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+      <init-param>
+          <param-name>encoding</param-name>
+          <param-value>utf-8</param-value>
+      </init-param>
+  </filter>
+  <filter-mapping>
+      <filter-name>CharacterEncodingFilter</filter-name>
+      <url-pattern>/*</url-pattern>
+  </filter-mapping> -->
+    <!-- Ajax配置开始,带编码转换(包括ajax提交的编码) --> 
+    <filter>
+        <filter-name>AjaxAnywhere</filter-name>
+        <filter-class>org.ajaxanywhere.AAFilter</filter-class>
+        <init-param>
+            <param-name>encoding</param-name><!-- 普通提交方式编码 -->
+            <param-value>utf-8</param-value>
+        </init-param>
+        <init-param>
+            <param-name>ajaxencoding</param-name><!-- AJAX提交方式编码 -->
+            <param-value>utf-8</param-value>
+        </init-param>
+    </filter>
+    
+    <filter-mapping>
+        <filter-name>AjaxAnywhere</filter-name>
+        <url-pattern>*</url-pattern>
+    </filter-mapping>
+   <jsp-config>
+	<taglib>
+      <taglib-uri>myTag</taglib-uri>
+      <taglib-location>/WEB-INF/tags/</taglib-location>
+    </taglib>
+	</jsp-config>
+  
+  <welcome-file-list>
+    <welcome-file>/WEB-INF/pages/login.jsp</welcome-file>
+  </welcome-file-list>
+</web-app>
